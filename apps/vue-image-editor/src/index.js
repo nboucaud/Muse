@@ -1,3 +1,3 @@
 import ImageEditor from './ImageEditor.vue';
 
-export { ImageEditor };
+export default ImageEditor;

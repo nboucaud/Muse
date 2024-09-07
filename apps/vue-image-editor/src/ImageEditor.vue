@@ -3,17 +3,20 @@
 </template>
 <script>
 import ImageEditor from 'tui-image-editor';
+import { ref, onMounted, onBeforeUnmount, defineComponent } from 'vue';
 
 const includeUIOptions = {
   includeUI: {
     initMenu: 'filter',
   },
 };
+
 const editorDefaultOptions = {
   cssMaxWidth: 700,
   cssMaxHeight: 500,
 };
-export default {
+
+export default defineComponent({
   name: 'TuiImageEditor',
   props: {
     includeUi: {
@@ -27,46 +30,35 @@ export default {
       },
     },
   },
-  mounted() {
-    let options = this.options;
-    if (this.includeUi) {
-      options = Object.assign(includeUIOptions, this.options);
-    }
-    this.editorInstance = new ImageEditor(this.$refs.tuiImageEditor, options);
-    this.addEventListener();
-  },
-  destroyed() {
-    Object.keys(this.$listeners).forEach((eventName) => {
-      this.editorInstance.off(eventName);
-    });
-    this.editorInstance.destroy();
-    this.editorInstance = null;
-  },
-  methods: {
-    addEventListener() {
-      Object.keys(this.$listeners).forEach((eventName) => {
-        this.editorInstance.on(eventName, (...args) => this.$emit(eventName, ...args));
-      });
-    },
-    getRootElement() {
-      return this.$refs.tuiImageEditor;
-    },
-    invoke(methodName, ...args) {
-      let result = null;
-      if (this.editorInstance[methodName]) {
-        result = this.editorInstance[methodName](...args);
-      } else if (methodName.indexOf('.') > -1) {
-        const func = this.getMethod(this.editorInstance, methodName);
+  setup(props, { emit }) {
+    const tuiImageEditor = ref(null);
+    let editorInstance = null;
 
+    const addEventListener = () => {
+      Object.keys(emit).forEach((eventName) => {
+        editorInstance.on(eventName, (...args) => emit(eventName, ...args));
+      });
+    };
+
+    const getRootElement = () => {
+      return tuiImageEditor.value;
+    };
+
+    const invoke = (methodName, ...args) => {
+      let result = null;
+      if (editorInstance[methodName]) {
+        result = editorInstance[methodName](...args);
+      } else if (methodName.indexOf('.') > -1) {
+        const func = getMethod(editorInstance, methodName);
         if (typeof func === 'function') {
           result = func(...args);
         }
       }
-
       return result;
-    },
-    getMethod(instance, methodName) {
-      const { first, rest } = this.parseDotMethodName(methodName);
+    };
+
+    const getMethod = (instance, methodName) => {
+      const { first, rest } = parseDotMethodName(methodName);
       const isInstance = instance.constructor.name !== 'Object';
       const type = typeof instance[first];
       let obj;
@@ -78,12 +70,13 @@ export default {
       }
 
       if (rest.length > 0) {
-        return this.getMethod(obj, rest);
+        return getMethod(obj, rest);
       }
 
       return obj;
-    },
-    parseDotMethodName(methodName) {
+    };
+
+    const parseDotMethodName = (methodName) => {
       const firstDotIdx = methodName.indexOf('.');
       let firstMethodName = methodName;
       let restMethodName = '';
@@ -97,7 +90,30 @@ export default {
         first: firstMethodName,
         rest: restMethodName,
       };
-    },
+    };
+
+    onMounted(() => {
+      let options = props.options;
+      if (props.includeUi) {
+        options = Object.assign(includeUIOptions, props.options);
+      }
+      editorInstance = new ImageEditor(tuiImageEditor.value, options);
+      addEventListener();
+    });
+
+    onBeforeUnmount(() => {
+      Object.keys(emit).forEach((eventName) => {
+        editorInstance.off(eventName);
+      });
+      editorInstance.destroy();
+      editorInstance = null;
+    });
+
+    return {
+      tuiImageEditor,
+      invoke,
+      getRootElement,
+    };
   },
-};
+});
 </script>

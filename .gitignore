@@ -67,3 +67,5 @@ api
 
 dist
 !_*/dist/
+
+*storybook.log
