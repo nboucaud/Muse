@@ -1,4 +1,4 @@
-import { ImageEditor } from '../src/index';
+import TuiImageEditor  from '../index.js';
 
 export default {
   title: 'ImageEditor',
@@ -23,9 +23,9 @@ const options = {
 export const IncludeUI = () => {
   return {
     components: {
-      ImageEditor,
+      TuiImageEditor,
     },
-    template: '<ImageEditor :includeUi="props.includeUI" :options="{...props}">test</ImageEditor>',
+    template: '<TuiImageEditor :includeUi="props.includeUI" :options="{...props}">test</TuiImageEditor>',
     created() {
       this.props = { ...options };
     },

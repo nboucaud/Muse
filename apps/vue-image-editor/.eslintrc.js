@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['tui/es6', 'plugin:vue/recommended', 'plugin:prettier/recommended'],
+  extends: ['tui/es6', 'plugin:vue/recommended', 'plugin:prettier/recommended', 'plugin:storybook/recommended'],
   plugins: ['vue', 'prettier'],
   parser: 'vue-eslint-parser',
   parserOptions: {
