@@ -313,6 +313,7 @@ declare namespace tuiImageEditor {
     public removeObject(id: number): Promise<void>;
     public resetFlip(): Promise<IFlipXYResolveObject>;
     public resizeCanvasDimension(dimension: ICanvasSize): Promise<void>;
+    public resetZoom(): void;
     public rotate(angle: AngleType, isSilent?: boolean): Promise<AngleType>;
     public setAngle(angle: AngleType, isSilent?: boolean): Promise<AngleType>;
     public setBrush(option: IBrushOptions): void;
